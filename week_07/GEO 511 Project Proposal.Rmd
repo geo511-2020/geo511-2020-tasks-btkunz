@@ -1,0 +1,51 @@
+---
+title: "GEO 511 Project Proposal"
+author: "Brendan Kunz"
+date: "10/14/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+##GEO 511 Project Proposal
+
+#Introduction:
+For my intended project that I wish to work on, I’ll be looking at 311 requests in Buffalo that allege code violations by landlords. This issue caught my interest because in a previous internship I had in my undergrad, I would canvass in mostly low income neighborhoods of Binghamton where I was able to see the negligence of slum lords in these areas. Within Binghamton, these poor living conditions for renters was mostly confined to a handful of neighborhoods so I’m wondering if I will be able to see something similar in Buffalo by looking at the 311 requests.
+
+Interactive New York City eviction map
+url: https://www.worstevictorsnyc.org/map/ 
+This is somewhat similar in that it focuses on housing issues and displays a graphic of where evictions are the highest across New York City.
+
+
+! [Alt text](/Users/Brendan/Documents/GEO511IMG1.png)
+
+Landlord Tech Watch
+Url: https://antievictionmappingproject.github.io/landlordtech/ 
+This source focuses on the use of biometrics by landlords to manage their rentals and tenant access to their buildings. This site briefly talks about how the technologies used end up having issues of racial bias, therefore these technologies should be discouraged. By mapping the deployment of these technologies, this site shows the extent to which this emerging technology is being used.
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+! [Alt text](/Users/Brendan/Documents/GEO511IMG2.png)
+
+Mapping America’s Rental Housing Crisis
+url: https://apps.urban.org/features/rental-housing-crisis-map/ 
+This interactive map focuses on the availability of units per each extremely low income renter (ELI) by county from 2000 to 2014. This is displayed in the form of a choropleth map which I’m hoping to use for my project so hopefully my final product will have a similar layout to this map! 
+
+! [Alt text](/Users/Brendan/Documents/GEO511IMG3.png)
+
+#Data sources:
+https://data.buffalony.gov/Quality-of-Life/311-Service-Requests-Opened-in-2018/3m6w-6utv 
+https://data.buffalony.gov/Economic-Neighborhood-Development/Neighborhoods/q9bk-zu3p 
+
+#Methods:
+My intent so far is to use ggplot2 to overlay the neighborhood map with the 311 requests map while using the dplyr package so that I may filter only the 311 requests relating to housing issues. How I’m going to overlay the maps is still in question a little bit, but I might be able to use the sp package to accomplish that.
+
+#Expected Results:
+My initial expectations are that the housing disputes between tenants and landlords will be confined largely to the east and west sides for two reasons. The first is because those are the two lower income sections of the city meaning landlords are less inclined to maintain the rental properties. The second reason is these two sections have more rentals than North and South Buffalo which tend to be mostly single family homes owned by the occupants. Based on the graphic we’ll see if the results confirm my initial suspicions.
