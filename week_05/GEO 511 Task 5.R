@@ -22,7 +22,7 @@ T_World <- world %>%
 filter(name_long == "Canada") %>%
 st_transform(T_World, crs = albers)
   Canada_Buffer <- st_buffer(T_World, 10000)
-
+st_crs(Canada_Buffer)
 #US transformation w/ crs
 NYS <- us_states %>% filter(NAME == "New York")
 st_transform(NYS, crs = albers)
