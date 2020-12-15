@@ -1,1 +1,1 @@
- 
+#In this week case study, what seemed to be useful was the scale_fill_viridis_c. With this function, an aesthetically pleasing legend was created rather than the clunky looking default legend scale that would be used otherwise. 
