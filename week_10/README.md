@@ -1,1 +1,1 @@
- 
+In this case study, the use of reshape2::melt was important because until I was able to figure out that this function was needed to allow the final map to be created, I kept running into errors that would say "Error: Only elements of the same class can be merged" 
