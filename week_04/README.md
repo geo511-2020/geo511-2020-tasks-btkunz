@@ -1,1 +1,1 @@
- 
+#For this week's readme I found that within ggplot, the color and facet wrap functions to be particularly useful in making maps more aesthetically pleasing and useful.

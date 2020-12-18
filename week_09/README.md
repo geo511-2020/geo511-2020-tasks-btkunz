@@ -1,1 +1,1 @@
- 
+In case study 9, the use of st_transform is something that is important and will be important as most of what I intend to use R for after this course ends is to create maps. By being able to set the crs, this function allows us to create improved maps by customizing the crs in accordance the scale of what is being mapped (whether it is only a state or a global map).

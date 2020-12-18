@@ -1,7 +1,199 @@
 ---
 title: "Case Study 10"
-author: Your Name
+author: Brendan Kunz
 date: August 1, 2020
 output: github_document
 ---
+ 
+```{r}
+library(raster)
+library(rasterVis)
+library(rgdal)
+library(ggmap)
+library(tidyverse)
+library(knitr)
+
+# New Packages
+library(ncdf4) # to import data from netcdf format
+```
+ 
+ 
+```{r}
+# Create afolder to hold the downloaded data
+dir.create("data",showWarnings = F) #create a folder to hold the data
+
+lulc_url="https://github.com/adammwilson/DataScienceData/blob/master/inst/extdata/appeears/MCD12Q1.051_aid0001.nc?raw=true"
+lst_url="https://github.com/adammwilson/DataScienceData/blob/master/inst/extdata/appeears/MOD11A2.006_aid0001.nc?raw=true"
+
+# download them
+download.file(lulc_url,destfile="data/MCD12Q1.051_aid0001.nc", mode="wb")
+download.file(lst_url,destfile="data/MOD11A2.006_aid0001.nc", mode="wb")
+
+lulc=stack("data/MCD12Q1.051_aid0001.nc",varname="Land_Cover_Type_1")
+lst=stack("data/MOD11A2.006_aid0001.nc",varname="LST_Day_1km")
+```
+ 
+ 
+```{r}
+lulc=lulc[[13]]
+plot(lulc)
+
+```
+ 
+ 
+```{r}
+Land_Cover_Type_1 = c(
+    Water = 0, 
+    `Evergreen Needleleaf forest` = 1, 
+    `Evergreen Broadleaf forest` = 2,
+    `Deciduous Needleleaf forest` = 3, 
+    `Deciduous Broadleaf forest` = 4,
+    `Mixed forest` = 5, 
+    `Closed shrublands` = 6,
+    `Open shrublands` = 7,
+    `Woody savannas` = 8, 
+    Savannas = 9,
+    Grasslands = 10,
+    `Permanent wetlands` = 11, 
+    Croplands = 12,
+    `Urban & built-up` = 13,
+    `Cropland/Natural vegetation mosaic` = 14, 
+    `Snow & ice` = 15,
+    `Barren/Sparsely vegetated` = 16, 
+    Unclassified = 254,
+    NoDataFill = 255)
+
+lcd=data.frame(
+  ID=Land_Cover_Type_1,
+  landcover=names(Land_Cover_Type_1),
+  col=c("#000080","#008000","#00FF00", "#99CC00","#99FF99", "#339966", "#993366", "#FFCC99", "#CCFFCC", "#FFCC00", "#FF9900", "#006699", "#FFFF00", "#FF0000", "#999966", "#FFFFFF", "#808080", "#000000", "#000000"),
+  stringsAsFactors = F)
+# colors from https://lpdaac.usgs.gov/about/news_archive/modisterra_land_cover_types_yearly_l3_global_005deg_cmg_mod12c1
+kable(head(lcd))
+
+# convert to raster (easy)
+lulc=as.factor(lulc)
+
+# update the RAT with a left join
+#levels(lulc)=left_join(levels(lulc)[[1]],lcd)
+
+# plot it
+gplot(lulc)+
+  geom_raster(aes(fill=as.factor(value)))+
+  scale_fill_manual(values=levels(lulc)[[1]]$col,
+                    labels=levels(lulc)[[1]]$landcover,
+                    name="Landcover Type")+
+  coord_equal()+
+  theme(legend.position = "bottom")+
+  guides(fill=guide_legend(ncol=1,byrow=TRUE))
+```
+ 
+```{r}
+plot(lst[[1:12]])
+```
+ 
+```{r}
+offs(lst)=-273.15
+plot(lst[[1:10]])
+```
+ 
+ 
+```{r}
+#names(lst)[1:5]
+
+tdates=names(lst)%>%
+  sub(pattern="X",replacement="")%>%
+  as.Date("%Y.%m.%d")
+
+names(lst)=1:nlayers(lst)
+lst=setZ(lst,tdates)
+```
+ 
+ #Part 1
+ 
+```{r Part1}
+lw=SpatialPoints(data.frame(x= -78.791547,y=43.007211))
+
+projection(lw) <- "+proj=longlat"
+
+spTransform(lw, CRSobj = proj4string(lst))
+#Help from Hadarou
+e_data <- t(raster::extract(lst,lw,buffer=1000,fun=mean,na.rm=T))
+
+e_data.dates <- getZ(lst)
+part1 <- cbind.data.frame(e_data,e_data.dates)
+names(part1) = c("Temp","Dates")
+ggplot(part1, aes(Dates, Temp))+
+  labs(x = "Date", y = "Monthly Mean Land Surface Temperature (C)")+
+  geom_point()+
+  geom_smooth(method = "loess", color = "purple", se = FALSE, span = 0.01, n = 100)
+
+
+```
+ 
+ #Part 2
+ 
+```{r Part2}
+library(kableExtra)
+tmonth <- as.numeric(format(getZ(lst),"%m"))
+lst_month <- stackApply(x = lst, indices = tmonth, fun = mean)
+names(lst_month)=month.name
+
+gplot(lst_month)+
+  geom_raster(aes(fill = value))+
+  facet_wrap(~variable)+
+  scale_fill_gradientn(colors = c("blue","gray","red"))+
+  theme(axis.text = element_blank())
+
+  kable(cellStats(lst_month,mean), col.names = "Mean")%>%
+    kable_styling()
+
+```
+ 
+ #Part 3
+ 
+```{r part3}
+pt3_resample <- resample(lulc, lst, method = "ngb")
+
+lcds1=cbind.data.frame(
+values(lst_month),
+ID=values(pt3_resample[[1]]))%>%
+  na.omit()
+
+pls <- lcds1 %>%
+  gather(key='month',value='value',-ID) %>%
+  mutate(ID=as.numeric(ID), month=factor(month,levels=month.name,ordered=T))
+pls2=left_join(lcds1, lcd)
+pls3 = pls2 %>% filter(landcover%in%c("Urban & built-up","Deciduous Broadleaf forest"))
+
+#Learned melt function through https://www.rdocumentation.org/packages/reshape2/versions/1.4.4/topics/melt
+#Helped by Connor
+pls4 = reshape2::melt(pls3,id.vars="landcover",
+                      measure.vars=c("January","February","March",
+                                    "April","May","June","July","August",
+                                    "September","October","November",
+                                    "December"))
+#Figured out axis text issue with https://stackoverflow.com/questions/1330989/rotating-and-spacing-axis-labels-in-ggplot2
+
+ggplot(pls4, aes(variable, value))+
+  geom_jitter()+
+  geom_violin(color = "red", alpha = 0.5)+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  facet_wrap(~landcover)+
+  labs(x = "Month", y = "Monthly Mean Land Temperature (C)", title = "Land Surface Temperature in Urban and Forest")
+```
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  

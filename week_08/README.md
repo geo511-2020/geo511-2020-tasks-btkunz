@@ -1,1 +1,1 @@
- 
+In case study 8, the introduction of read_table is important, especially for future research that involves coding in R. By being able to automatically read and subsequently plot data from a table with read_table and then using that for ggplot, a lot of time and effort can be saved when compared to entering in the data manually. 

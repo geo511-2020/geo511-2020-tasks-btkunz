@@ -1,1 +1,1 @@
- 
+#In this week's lectures and readings, I have found the st_geometry, st_union and other functions starting with "st_" to be useful as a means of making world maps presentable when it comes to trying to focus on for example different values by country.

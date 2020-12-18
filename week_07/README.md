@@ -1,1 +1,1 @@
- 
+In case study 7,  the use of geom_density to create a complex graph could be of interest if I'm working on an extracurricular project over break, which I intend to. For a potential out of class work, geom_density could be useful if I'm comparing various demographics by regions, neighborhoods, or other spatial variables.

@@ -1,1 +1,1 @@
- 
+For this last case study, I found the dyRangeSelector to be interesting as by allowing the user to looking at only a subset of the graph, small patterns that wouldn't otherwise be noticed could be easier to detect. 
